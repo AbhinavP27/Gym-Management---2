@@ -1,0 +1,103 @@
+.trainers{
+    padding: 80px 20px;
+    text-align: center;
+    background: linear-gradient(to bottom,#1a1a1a,#0f0f0f);
+}
+
+.trainer-title{
+    font-size: 36px;
+    color: white;
+    margin-bottom: 50px;
+    letter-spacing: 2px;
+}
+
+.trainer-container{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 40px;
+}
+
+.trainer-card{
+    width: 250px;
+    padding: 30px 20px;
+    border-radius: 20px;
+
+    backdrop-filter: blur(10px);
+    background: rgba(255,255,255,0.08);
+
+    border: 1px solid rgba(255,255,255,0.1);
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+
+    transition: all 0.4s ease;
+}
+
+.trainer-card:hover{
+    transform: translateY(-12px) scale(1.03);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+}
+
+.trainer-card img{
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+
+    border: 4px solid #0af4e5;
+}
+
+.trainer-card-avatar{
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    border: 4px solid #0af4e5;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: linear-gradient(135deg, rgba(10, 244, 229, 0.18), rgba(37, 99, 235, 0.28));
+    color:white;
+    font-size: 42px;
+    font-weight:700;
+}
+
+.trainer-card h2{
+    color: white;
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.trainer-card p{
+    color: #0af4e5;
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+.trainer-overlay{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+
+  background:rgba(0,0,0,0.9);
+  color:white;
+  border-radius: 20px;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+
+  padding:20px;
+  text-align:center;
+
+  opacity:0;
+  transition:0.4s;
+}
+
+.trainer-card:hover .trainer-overlay{
+  opacity:1;
+}

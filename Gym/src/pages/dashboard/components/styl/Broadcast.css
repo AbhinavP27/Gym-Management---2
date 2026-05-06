@@ -1,0 +1,103 @@
+.broadcast-page {
+  padding: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.broadcast-page__header {
+  margin-bottom: 2rem;
+}
+
+.broadcast-page__header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.broadcast-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.broadcast-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.broadcast-form .field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.broadcast-form .field span {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.broadcast-form .field input,
+.broadcast-form .field textarea,
+.broadcast-form .field select {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--input-bg);
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.broadcast-form .field input:focus,
+.broadcast-form .field textarea:focus,
+.broadcast-form .field select:focus {
+  outline: none;
+  border-color: var(--accent-color, #00e5ff);
+}
+
+.broadcast-form .field select option {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.broadcast-form .action-row {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.broadcast-form .btn-primary {
+  background: var(--accent-color, #00e5ff);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 1.5rem;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.2s ease;
+}
+
+.broadcast-form .btn-primary:hover {
+  opacity: 0.9;
+}
+
+.broadcast-form .btn-disabled {
+  background: #374151;
+  color: #9ca3af;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 1.5rem;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: not-allowed;
+  display: flex;
+  align-items: center;
+}

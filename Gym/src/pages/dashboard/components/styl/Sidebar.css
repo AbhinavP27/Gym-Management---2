@@ -1,0 +1,223 @@
+.dashboard-shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-gradient);
+  color: var(--text-primary);
+  overflow-x: hidden;
+}
+
+.sidebar {
+  width: 240px;
+  height: 100vh;
+  background: var(--sidebar-bg);
+  padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  border-right: 1px solid var(--border-color);
+  backdrop-filter: blur(12px) saturate(130%);
+  -webkit-backdrop-filter: blur(12px) saturate(130%);
+  box-sizing: border-box;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
+}
+
+/* Title */
+.sidebar-title {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* Menu */
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 999px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.55);
+}
+
+/* Links */
+.sidebar-menu li a {
+  display: block;
+  padding: 12px 14px;
+  border-radius: 10px;
+  color: #94a3b8; /* gray text */
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+/* Hover effect */
+.sidebar-menu li a:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  transform: translateX(4px);
+}
+
+/* Active style (optional later with NavLink) */
+.sidebar-menu li a.active {
+  background: #3b82f6;
+  color: #fff;
+}
+
+/* Logout style */
+.logout {
+  margin-top: 20px;
+  color: #ef4444 !important;
+}
+
+.logout:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.sidebar-menu li a {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* space between icon & text */
+  padding: 12px 14px;
+  border-radius: 10px;
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+/* Icon styling */
+.sidebar-menu li a svg {
+  flex-shrink: 0;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.sidebar-link--disabled {
+  cursor: not-allowed;
+  color: #64748b;
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.sidebar-link--disabled span {
+  flex: 1;
+}
+
+.sidebar-link--disabled small {
+  color: #f59e0b;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Active link */
+.sidebar-menu li a.active {
+  background: var(--accent-color);
+  color: #fff;
+}
+
+.sidebar-menu li a:hover svg {
+  transform: scale(1.1);
+}
+
+.content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin-left: 240px;
+  transition: margin-left 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 16px 16px;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px 0 0;
+}
+
+.dashboard-mobile-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--input-bg);
+  color: #e5e7eb;
+  cursor: pointer;
+  margin-top: 12px;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: -100%; /* hidden by default */
+    top: 0;
+    width: 220px;
+    height: 100vh;
+    background: linear-gradient(to bottom, rgba(22, 22, 22, 0.85), rgba(13, 13, 13, 0.78));
+    z-index: 999;
+    transition: left 0.3s ease;
+  }
+
+  .sidebar.open {
+    left: 0; /* slide in */
+  }
+
+  .content-area {
+    margin-left: 0;
+    padding: 0 12px 12px;
+  }
+
+  .dashboard-mobile-toggle {
+    display: inline-flex;
+  }
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 999;
+}

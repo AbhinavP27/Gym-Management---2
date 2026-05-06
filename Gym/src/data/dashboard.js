@@ -1,0 +1,193 @@
+import trainer1 from "../assets/trainer1.png";
+import trainer2 from "../assets/trainer2.png";
+import trainer3 from "../assets/trainer3.png";
+
+const trainerProfiles = [
+  {
+    id: 1,
+    name: "Tharun Kumar",
+    role: "Strength Trainer",
+    email: "tharun.kumar@urbangrind.com",
+    image: trainer1,
+    status: "Active",
+    certificates: "ACE Certified Trainer",
+    experience: "8+ Years Experience",
+    details: "Specialist in strength training, muscle gain programs and athletic performance.",
+  },
+  {
+    id: 2,
+    name: "Varsha Tharun",
+    role: "Cardio Trainer",
+    email: "varsha.tharun@urbangrind.com",
+    image: trainer2,
+    status: "Busy",
+    certificates: "ISSA Cardio Specialist",
+    experience: "6+ Years Experience",
+    details: "Expert in fat loss, endurance training and cardiovascular fitness programs.",
+  },
+  {
+    id: 3,
+    name: "Alen Mathew",
+    role: "Bodybuilding Trainer",
+    email: "alen.mathew@urbangrind.com",
+    image: trainer3,
+    status: "On Leave",
+    certificates: "IFBB Certified Coach",
+    experience: "10+ Years Experience",
+    details: "Professional bodybuilding coach with expertise in competition preparation.",
+  },
+];
+
+export const membershipPlans = [
+  {
+    id: 1,
+    name: "Basic",
+    price: "Rs 999 / month",
+    features: [
+      "Access to Gym Equipment",
+      "Basic Workout Plan",
+      "Locker Facility",
+      "Fitness Assessment",
+    ],
+    popular: false,
+    trainerRequired: false,
+  },
+  {
+    id: 2,
+    name: "Gold",
+    price: "Rs 3499 / month",
+    features: [
+      "All Premium Features",
+      "Personal Trainer (8 sessions)",
+      "Diet Consultation",
+      "Monthly Progress Tracking",
+    ],
+    popular: true,
+    trainerRequired: true,
+  },
+  {
+    id: 3,
+    name: "Diamond",
+    price: "Rs 5499 / month",
+    features: [
+      "All Gold Features",
+      "Unlimited Personal Training",
+      "Body Transformation Program",
+      "Priority Support",
+    ],
+    popular: false,
+    trainerRequired: true,
+  },
+];
+
+export const members = [
+  {
+    id: 101,
+    name: "Aarav Mehta",
+    email: "aarav.mehta@member.urbangrind.com",
+    plan: "Gold",
+    trainerId: 1,
+    trainer: "Tharun Kumar",
+    expiry: "2026-04-18",
+  },
+  { id: 102, name: "Neha Verma", email: "neha.verma@member.urbangrind.com", plan: "Diamond", trainerId: 1, trainer: "Tharun Kumar", expiry: "2026-04-22" },
+  { id: 103, name: "Rohan Nair", email: "rohan.nair@member.urbangrind.com", plan: "Gold", trainerId: 1, trainer: "Tharun Kumar", expiry: "2026-04-29" },
+  { id: 104, name: "Priya Menon", email: "priya.menon@member.urbangrind.com", plan: "Basic", trainerId: 1, trainer: "Tharun Kumar", expiry: "2026-05-03" },
+  { id: 105, name: "Karthik Das", email: "karthik.das@member.urbangrind.com", plan: "Diamond", trainerId: 1, trainer: "Tharun Kumar", expiry: "2026-05-09" },
+  { id: 106, name: "Sana Ali", email: "sana.ali@member.urbangrind.com", plan: "Gold", trainerId: 1, trainer: "Tharun Kumar", expiry: "2026-05-14" },
+  { id: 107, name: "Vivek Raj", email: "vivek.raj@member.urbangrind.com", plan: "Basic", trainerId: 1, trainer: "Tharun Kumar", expiry: "2026-05-19" },
+  { id: 108, name: "Meera Pillai", email: "meera.pillai@member.urbangrind.com", plan: "Gold", trainerId: 1, trainer: "Tharun Kumar", expiry: "2026-05-24" },
+  { id: 109, name: "Ishaan Kapoor", email: "ishaan.kapoor@member.urbangrind.com", plan: "Diamond", trainerId: 1, trainer: "Tharun Kumar", expiry: "2026-05-30" },
+  { id: 110, name: "Kavya Reddy", email: "kavya.reddy@member.urbangrind.com", plan: "Basic", trainerId: 1, trainer: "Tharun Kumar", expiry: "2026-06-05" },
+  { id: 111, name: "Rahul Soman", email: "rahul.soman@member.urbangrind.com", plan: "Gold", trainerId: 1, trainer: "Tharun Kumar", expiry: "2026-06-11" },
+  { id: 112, name: "Ananya Iyer", email: "ananya.iyer@member.urbangrind.com", plan: "Diamond", trainerId: 1, trainer: "Tharun Kumar", expiry: "2026-06-17" },
+  { id: 113, name: "Tarun Joseph", email: "tarun.joseph@member.urbangrind.com", plan: "Basic", trainerId: 1, trainer: "Tharun Kumar", expiry: "2026-06-22" },
+  { id: 114, name: "Diya Balan", email: "diya.balan@member.urbangrind.com", plan: "Gold", trainerId: 1, trainer: "Tharun Kumar", expiry: "2026-06-28" },
+  { id: 115, name: "Manav Khanna", email: "manav.khanna@member.urbangrind.com", plan: "Diamond", trainerId: 1, trainer: "Tharun Kumar", expiry: "2026-07-03" },
+  { id: 116, name: "Sneha George", email: "sneha.george@member.urbangrind.com", plan: "Basic", trainerId: 1, trainer: "Tharun Kumar", expiry: "2026-07-09" },
+  { id: 117, name: "Arjun Paul", email: "arjun.paul@member.urbangrind.com", plan: "Gold", trainerId: 1, trainer: "Tharun Kumar", expiry: "2026-07-14" },
+  { id: 118, name: "Nisha Thomas", email: "nisha.thomas@member.urbangrind.com", plan: "Diamond", trainerId: 1, trainer: "Tharun Kumar", expiry: "2026-07-20" },
+  { id: 119, name: "Varun Shetty", email: "varun.shetty@member.urbangrind.com", plan: "Basic", trainerId: 1, trainer: "Tharun Kumar", expiry: "2026-07-25" },
+  { id: 200, name: "Pooja Rao", email: "pooja.rao@member.urbangrind.com", plan: "Gold", trainerId: 1, trainer: "Tharun Kumar", expiry: "2026-07-31" },
+  
+  {
+    id: 201,
+    name: "Aditi Sharma",
+    email: "aditi.sharma@member.urbangrind.com",
+    plan: "Gold",
+    trainerId: 2,
+    trainer: "Varsha Tharun",
+    expiry: "2026-08-04",
+  },
+  { id: 202, name: "Rohit Bhatia", email: "rohit.bhatia@member.urbangrind.com", plan: "Diamond", trainerId: 2, trainer: "Varsha Tharun", expiry: "2026-08-08" },
+  { id: 203, name: "Swathi Krishnan", email: "swathi.krishnan@member.urbangrind.com", plan: "Basic", trainerId: 2, trainer: "Varsha Tharun", expiry: "2026-08-12" },
+  { id: 204, name: "Dev Malhotra", email: "dev.malhotra@member.urbangrind.com", plan: "Gold", trainerId: 2, trainer: "Varsha Tharun", expiry: "2026-08-16" },
+  { id: 205, name: "Nandini Rao", email: "nandini.rao@member.urbangrind.com", plan: "Diamond", trainerId: 2, trainer: "Varsha Tharun", expiry: "2026-08-20" },
+  { id: 206, name: "Akash Kulkarni", email: "akash.kulkarni@member.urbangrind.com", plan: "Basic", trainerId: 2, trainer: "Varsha Tharun", expiry: "2026-08-24" },
+  { id: 207, name: "Isha Kapoor", email: "isha.kapoor@member.urbangrind.com", plan: "Gold", trainerId: 2, trainer: "Varsha Tharun", expiry: "2026-08-28" },
+  { id: 208, name: "Mohit Chawla", email: "mohit.chawla@member.urbangrind.com", plan: "Diamond", trainerId: 2, trainer: "Varsha Tharun", expiry: "2026-09-01" },
+  { id: 209, name: "Lavanya Srinivasan", email: "lavanya.srinivasan@member.urbangrind.com", plan: "Basic", trainerId: 2, trainer: "Varsha Tharun", expiry: "2026-09-05" },
+  { id: 210, name: "Gaurav Bedi", email: "gaurav.bedi@member.urbangrind.com", plan: "Gold", trainerId: 2, trainer: "Varsha Tharun", expiry: "2026-09-09" },
+  { id: 221, name: "Bhargavi Iyer", email: "bhargavi.iyer@member.urbangrind.com", plan: "Diamond", trainerId: 2, trainer: "Varsha Tharun", expiry: "2026-09-13" },
+  { id: 222, name: "Kunal Arora", email: "kunal.arora@member.urbangrind.com", plan: "Gold", trainerId: 2, trainer: "Varsha Tharun", expiry: "2026-09-17" },
+  { id: 223, name: "Namrata Pillai", email: "namrata.pillai@member.urbangrind.com", plan: "Basic", trainerId: 2, trainer: "Varsha Tharun", expiry: "2026-09-21" },
+  { id: 224, name: "Harsha Vardhan", email: "harsha.vardhan@member.urbangrind.com", plan: "Gold", trainerId: 2, trainer: "Varsha Tharun", expiry: "2026-09-25" },
+  { id: 225, name: "Pallavi Nair", email: "pallavi.nair@member.urbangrind.com", plan: "Diamond", trainerId: 2, trainer: "Varsha Tharun", expiry: "2026-09-29" },
+  { id: 226, name: "Rachit Jain", email: "rachit.jain@member.urbangrind.com", plan: "Basic", trainerId: 2, trainer: "Varsha Tharun", expiry: "2026-10-03" },
+  { id: 227, name: "Shreya Menon", email: "shreya.menon@member.urbangrind.com", plan: "Gold", trainerId: 2, trainer: "Varsha Tharun", expiry: "2026-10-07" },
+  { id: 228, name: "Manish Yadav", email: "manish.yadav@member.urbangrind.com", plan: "Diamond", trainerId: 2, trainer: "Varsha Tharun", expiry: "2026-10-11" },
+  { id: 229, name: "Keerthana Babu", email: "keerthana.babu@member.urbangrind.com", plan: "Basic", trainerId: 2, trainer: "Varsha Tharun", expiry: "2026-10-15" },
+  { id: 230, name: "Adarsh Nanda", email: "adarsh.nanda@member.urbangrind.com", plan: "Gold", trainerId: 2, trainer: "Varsha Tharun", expiry: "2026-10-19" },
+  {
+    id: 211,
+    name: "Harish Nambiar",
+    email: "harish.nambiar@member.urbangrind.com",
+    plan: "Diamond",
+    trainerId: 3,
+    trainer: "Alen Mathew",
+    expiry: "2026-08-06",
+  },
+  { id: 212, name: "Pritika Das", email: "pritika.das@member.urbangrind.com", plan: "Gold", trainerId: 3, trainer: "Alen Mathew", expiry: "2026-08-10" },
+  { id: 213, name: "Yash Patil", email: "yash.patil@member.urbangrind.com", plan: "Basic", trainerId: 3, trainer: "Alen Mathew", expiry: "2026-08-14" },
+  { id: 214, name: "Sanjana Murthy", email: "sanjana.murthy@member.urbangrind.com", plan: "Gold", trainerId: 3, trainer: "Alen Mathew", expiry: "2026-08-18" },
+  { id: 215, name: "Abhinav Singh", email: "abhinav.singh@member.urbangrind.com", plan: "Diamond", trainerId: 3, trainer: "Alen Mathew", expiry: "2026-08-22" },
+  { id: 216, name: "Kriti Joshi", email: "kriti.joshi@member.urbangrind.com", plan: "Basic", trainerId: 3, trainer: "Alen Mathew", expiry: "2026-08-26" },
+  { id: 217, name: "Ritesh Menon", email: "ritesh.menon@member.urbangrind.com", plan: "Gold", trainerId: 3, trainer: "Alen Mathew", expiry: "2026-08-30" },
+  { id: 218, name: "Bhavna Sethi", email: "bhavna.sethi@member.urbangrind.com", plan: "Diamond", trainerId: 3, trainer: "Alen Mathew", expiry: "2026-09-03" },
+  { id: 219, name: "Deepak Narayan", email: "deepak.narayan@member.urbangrind.com", plan: "Basic", trainerId: 3, trainer: "Alen Mathew", expiry: "2026-09-07" },
+  { id: 220, name: "Tanvi Bose", email: "tanvi.bose@member.urbangrind.com", plan: "Gold", trainerId: 3, trainer: "Alen Mathew", expiry: "2026-09-11" },
+  { id: 231, name: "Madhuri Kulshreshtha", email: "madhuri.kulshreshtha@member.urbangrind.com", plan: "Diamond", trainerId: 3, trainer: "Alen Mathew", expiry: "2026-09-15" },
+  { id: 232, name: "Nikhil Fernandes", email: "nikhil.fernandes@member.urbangrind.com", plan: "Gold", trainerId: 3, trainer: "Alen Mathew", expiry: "2026-09-19" },
+  { id: 233, name: "Sowmya Ramesh", email: "sowmya.ramesh@member.urbangrind.com", plan: "Basic", trainerId: 3, trainer: "Alen Mathew", expiry: "2026-09-23" },
+  { id: 234, name: "Pranav Chopra", email: "pranav.chopra@member.urbangrind.com", plan: "Gold", trainerId: 3, trainer: "Alen Mathew", expiry: "2026-09-27" },
+  { id: 235, name: "Jhanvi Suresh", email: "jhanvi.suresh@member.urbangrind.com", plan: "Diamond", trainerId: 3, trainer: "Alen Mathew", expiry: "2026-10-01" },
+  { id: 236, name: "Rohan Deshpande", email: "rohan.deshpande@member.urbangrind.com", plan: "Basic", trainerId: 3, trainer: "Alen Mathew", expiry: "2026-10-05" },
+  { id: 237, name: "Mitali Roy", email: "mitali.roy@member.urbangrind.com", plan: "Gold", trainerId: 3, trainer: "Alen Mathew", expiry: "2026-10-09" },
+  { id: 238, name: "Sachin Bhasin", email: "sachin.bhasin@member.urbangrind.com", plan: "Diamond", trainerId: 3, trainer: "Alen Mathew", expiry: "2026-10-13" },
+  { id: 239, name: "Ankita Mohan", email: "ankita.mohan@member.urbangrind.com", plan: "Basic", trainerId: 3, trainer: "Alen Mathew", expiry: "2026-10-17" },
+  { id: 240, name: "Keshav Tiwari", email: "keshav.tiwari@member.urbangrind.com", plan: "Gold", trainerId: 3, trainer: "Alen Mathew", expiry: "2026-10-21" },
+];
+
+export const trainers = trainerProfiles.map((trainer) => ({
+  ...trainer,
+  specialization: trainer.role,
+  members: members.filter((member) => member.trainerId === trainer.id).length,
+}));
+
+const planPriceMap = {
+  Basic: 999,
+  Gold: 3499,
+  Diamond: 5499,
+};
+
+export const stats = {
+  members: members.length,
+  trainers: trainers.length,
+  activePlans: membershipPlans.length,
+  revenue: members.reduce((total, member) => total + (planPriceMap[member.plan] ?? 0), 0),
+};
+
+export const membershipChart = membershipPlans.map((plan) => ({
+  name: plan.name,
+  value: members.filter((member) => member.plan === plan.name).length,
+}));

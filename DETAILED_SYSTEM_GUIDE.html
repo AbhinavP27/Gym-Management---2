@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detailed System Modules & Workflow Guide</title>
+    <style>
+        :root {
+            --primary: #1e293b;
+            --accent: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --bg: #f8fafc;
+            --card-bg: #fff;
+        }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--primary);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        .sidebar-doc {
+            width: 280px;
+            height: 100vh;
+            background: var(--primary);
+            color: #fff;
+            position: fixed;
+            padding: 30px 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        .main-doc {
+            margin-left: 280px;
+            padding: 60px;
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 40px; color: var(--primary); border-left: 8px solid var(--accent); padding-left: 20px; }
+        h2 { font-size: 1.8rem; margin-top: 50px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; color: var(--accent); }
+        h3 { font-size: 1.3rem; margin-top: 30px; color: #334155; }
+        .module-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 24px 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+        .nav-link {
+            display: block;
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 10px 0;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+        .nav-link:hover { color: #fff; }
+        .workflow-box {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid var(--accent);
+        }
+        .step { font-weight: 700; color: var(--accent); }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #edf2f7; }
+        th { background: #f8fafc; color: #475569; font-size: 0.85rem; text-transform: uppercase; }
+        .badge { padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+        .badge-api { background: #dcfce7; color: #166534; }
+        .badge-ui { background: #dbeafe; color: #1e40af; }
+        @media (max-width: 1024px) {
+            .sidebar-doc { display: none; }
+            .main-doc { margin-left: 0; padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-doc">
+        <h2 style="color: white; border: none; font-size: 1.4rem;">System Index</h2>
+        <a href="#auth" class="nav-link">1. Authentication Flow</a>
+        <a href="#admin" class="nav-link">2. Admin Operations</a>
+        <a href="#trainer" class="nav-link">3. Trainer Management</a>
+        <a href="#member" class="nav-link">4. Member Experience</a>
+        <a href="#comms" class="nav-link">5. Communication Engine</a>
+        <a href="#themes" class="nav-link">6. Premium Customization</a>
+    </div>
+
+    <div class="main-doc">
+        <h1>Urban Grind: Full Component & Workflow Documentation</h1>
+
+        <!-- AUTH FLOW -->
+        <section id="auth">
+            <h2>1. Global Authentication & Role Routing</h2>
+            <div class="module-card">
+                <p>The system utilizes <strong>State-Driven Routing</strong>. The entire app experience is gated by the <code>AuthProvider</code>.</p>
+                <div class="workflow-box">
+                    <p><span class="step">Step 1:</span> User submits credentials via <code>Login.jsx</code>.</p>
+                    <p><span class="step">Step 2:</span> Backend validates and returns a **JWT Access Token** + User Profile Data.</p>
+                    <p><span class="step">Step 3:</span> <code>AuthContext</code> stores the token in LocalStorage and sets the <code>currentUser</code> state.</p>
+                    <p><span class="step">Step 4:</span> <code>ProtectedRoute.jsx</code> evaluates <code>profile.role</code> and allows access to <code>/admin</code>, <code>/trainer</code>, or <code>/user</code> routes.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADMIN MODULES -->
+        <section id="admin">
+            <h2>2. Admin Dashboard Modules</h2>
+            
+            <div class="module-card">
+                <h3>A. Member Central (<code>Members.jsx</code>)</h3>
+                <p>The centralized hub for all gym attendees.</p>
+                <table>
+                    <tr><th>Action</th><th>Type</th><th>Logic Description</th></tr>
+                    <tr><td>Search/Filter</td><td><span class="badge badge-ui">UI</span></td><td>Instant filtering using useMemo across memory-cached roster.</td></tr>
+                    <tr><td>Plan Reminder</td><td><span class="badge badge-api">API</span></td><td>Dispatches POST to <code>remind_plan/</code>; triggers Signal-to-Email loop.</td></tr>
+                    <tr><td>Lifecycle Mgmt</td><td><span class="badge badge-api">API</span></td><td>Edit plans, delete accounts, or update trainer assignments.</td></tr>
+                </table>
+            </div>
+
+            <div class="module-card">
+                <h3>B. Trainer Directorate (<code>Trainer.jsx</code>)</h3>
+                <p>Controls the personnel staffing the facility.</p>
+                <div class="workflow-box">
+                    <p><strong>Assignment Workflow:</strong> Admin creates a trainer profile -> Selects "Active" status -> Assigns to Member. The member receives an automated notification: <em>"A new trainer has been assigned to your profile!"</em></p>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <h3>C. Broadcast Command (<code>Broadcast.jsx</code>)</h3>
+                <p>The heavy-duty marketing engine.</p>
+                <p><strong>Audience Logic:</strong> The Admin select-input allows choosing "Gold Only", "Diamond Only", or "All Members". The backend retrieves emails strictly for members whose <code>plan__name</code> matches the selection.</p>
+            </div>
+        </section>
+
+        <!-- TRAINER MODULES -->
+        <section id="trainer">
+            <h2>3. Trainer Dashboard Modules</h2>
+
+            <div class="module-card">
+                <h3>A. Client Roster</h3>
+                <p>Unlike Admin tools, Trainer views are <strong>Strictly Isolated</strong>. They can only see members where <code>member.trainer.id == currentTrainer.id</code>.</p>
+            </div>
+
+            <div class="module-card">
+                <h3>B. Fitness Planning (Workouts & Diets)</h3>
+                <div class="workflow-box">
+                    <p><span class="step">Workflow:</span> Trainer selects a member -> Inputs Exercises/Meal Plans -> Saves to <code>WorkoutPlan</code> model. Once saved, the Member Dashboard instantly populates with the latest data.</p>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <h3>C. Attendance Scribe (<code>Attendance.jsx</code>)</h3>
+                <p>Trainers log daily check-ins. Each log entry is timestamped and categorized as "Present", "Absent", or "Excused", feeding directly into the analytical charts.</p>
+            </div>
+        </section>
+
+        <!-- MEMBER MODULES -->
+        <section id="member">
+            <h2>4. Member Dashboard Experience</h2>
+            <div class="module-card">
+                <p>Members have a read-focused dashboard prioritized for consumption and motivation.</p>
+                <h3>Component Roles:</h3>
+                <ul>
+                    <li><strong>Progress Chart:</strong> Visualizes weight/performance metrics over time.</li>
+                    <li><strong>My Plan:</strong> Displays active subscription tier and countdown to expiry.</li>
+                    <li><strong>My Routine:</strong> Fetches Workout/Diet plans assigned by their specific trainer.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- COMMUNICATION -->
+        <section id="comms">
+            <h2>5. The Communication Engine (Signals)</h2>
+            <div class="module-card">
+                <p>This backend automation is the "glue" of the project. It uses <strong>Django post_save Signals</strong>.</p>
+                <div class="workflow-box">
+                    <p><strong>Trigger:</strong> Any instance created in the <code>Notification</code> table.</p>
+                    <p><strong>Process:</strong> Background worker captures the <code>user.email</code>, the <code>title</code>, and <code>message</code>.</p>
+                    <p><strong>Result:</strong> An HTML email is constructed and dispatched using <code>email_utils.py</code>.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- THEME ENGINE -->
+        <section id="themes">
+            <h2>6. Premium Theme & UX Persistence</h2>
+            <div class="module-card">
+                <p>The app implements a **Class-Based Variable Theme System**.</p>
+                <ul>
+                    <li><strong>State Management:</strong> <code>localStorage.getItem("app-theme")</code>.</li>
+                    <li><strong>Application:</strong> Applied via <code>useEffect</code> in <code>App.jsx</code> to the <code>body</code> tag.</li>
+                    <li><strong>Gradient Logic:</strong> Themes like "Electric Sunset" use <code>linear-gradient</code> backgrounds and transparent card backgrounds to create a "Glassmorphism" effect.</li>
+                </ul>
+            </div>
+        </section>
+
+        <div style="text-align: center; margin-top: 100px; padding: 40px; border-top: 1px solid #e2e8f0; color: #94a3b8;">
+            <p>End of Comprehensive System Documentation</p>
+            <p>&copy; 2026 Urban Grind Digital Strategy</p>
+        </div>
+    </div>
+
+</body>
+</html>

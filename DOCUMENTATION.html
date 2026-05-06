@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Management System - Documentation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: #f4f7f6;
+        }
+        .container {
+            background-color: #fff;
+            padding: 50px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1a3a5f;
+            border-bottom: 2px solid #1a3a5f;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        h2 {
+            color: #2c5282;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #4a5568;
+        }
+        .tech-stack {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .tech-item {
+            background: #edf2f7;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        .workflow {
+            background: #fdfcf0;
+            border-left: 5px solid #d69e2e;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .feature-list {
+            columns: 2;
+            -webkit-columns: 2;
+            -moz-columns: 2;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #718096;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            background-color: #f7fafc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Urban Grind: Gym Management System</h1>
+        <p style="text-align: center; font-style: italic;">Complete Technical Documentation & System Overview</p>
+
+        <h2>1. System Overview</h2>
+        <p>The Urban Grind platform is an enterprise-grade digital solution designed to streamline gym operations. It provides a robust management layer for admins, a specialized toolset for trainers, and a personalized experience for members.</p>
+
+        <h2>2. Technology Stack</h2>
+        <div class="tech-stack">
+            <div class="tech-item">
+                <h3>Frontend Architecture</h3>
+                <ul>
+                    <li><strong>React.js (Vite)</strong>: For high-speed UI rendering.</li>
+                    <li><strong>Context API</strong>: Managing global state (Auth, Members, Plans).</li>
+                    <li><strong>Vanilla CSS</strong>: Customizable variable-based styling.</li>
+                </ul>
+            </div>
+            <div class="tech-item">
+                <h3>Backend Infrastructure</h3>
+                <ul>
+                    <li><strong>Django & DRF</strong>: RESTful API for secure data handling.</li>
+                    <li><strong>JWT Authentication</strong>: Token-based stateless security.</li>
+                    <li><strong>Django Signals</strong>: Automated background workflows.</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>3. Core Features</h2>
+        <div class="feature-list">
+            <ul>
+                <li><strong>Multi-Role Access</strong>: Personalized views for Admin, Trainer, and Member.</li>
+                <li><strong>Subscription Tiers</strong>: Logic for Basic, Gold, and Diamond memberships.</li>
+                <li><strong>Broadcast System</strong>: Mass-email marketing with plan-based filtering.</li>
+                <li><strong>Theme Engine</strong>: Gradient and Premium themes with persistence.</li>
+                <li><strong>Attendance Tracker</strong>: Analytical views for member activity.</li>
+                <li><strong>Communication Suite</strong>: Integrated email and in-app alerts.</li>
+            </ul>
+        </div>
+
+        <h2>4. Key Workflows</h2>
+
+        <div class="workflow">
+            <h3>Automated Member Onboarding</h3>
+            <p>When a member registers, the system executes a transactional save involving the User, Profile, and Member models. Upon completion, a <strong>Welcome Email</strong> is automatically dispatched via the Django backend utility.</p>
+        </div>
+
+        <div class="workflow">
+            <h3>The Notification-Email Sync</h3>
+            <p>To ensure members never miss an update, we implemented a <strong>Post-Save Signal</strong>. Whenever an in-app notification is created (for plan reminders, trainer assignments, etc.), the system automatically duplicates the message and sends it as an official email.</p>
+        </div>
+
+        <div class="workflow">
+            <h3>Segmented Marketing Broadcasts</h3>
+            <p>Admins can choose target audiences (e.g., "Diamond Members Only"). The system dynamically filters active emails and sends a batch broadcast using a customized HTML template, ensuring 100% targeting accuracy.</p>
+        </div>
+
+        <h2>5. Data Architecture</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Model</th>
+                    <th>Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>User</strong></td>
+                    <td>Core authentication and credentials.</td>
+                </tr>
+                <tr>
+                    <td><strong>Profile</strong></td>
+                    <td>Extended data (Role: ADMIN, TRAINER, MEMBER).</td>
+                </tr>
+                <tr>
+                    <td><strong>Member</strong></td>
+                    <td>Subscription details, expiry, and trainer links.</td>
+                </tr>
+                <tr>
+                    <td><strong>Broadcast</strong></td>
+                    <td>Marketing logs and history.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>6. Setup & Deployment</h2>
+        <h3>Backend</h3>
+        <p>1. Install requirements: <code>pip install -r requirements.txt</code><br>
+           2. Run migrations: <code>python manage.py migrate</code><br>
+           3. Start Server: <code>python manage.py runserver</code></p>
+        
+        <h3>Frontend</h3>
+        <p>1. Install dependencies: <code>npm install</code><br>
+           2. Run Dev: <code>npm run dev</code></p>
+
+        <div class="footer">
+            <p>&copy; 2026 Urban Grind Gym Management System. All Rights Reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

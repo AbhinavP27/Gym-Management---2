@@ -1,0 +1,128 @@
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, rgba(26, 26, 26, 0.8), rgba(15, 15, 15, 0.65));
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  margin: 12px 0 0 0;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.topbar-left h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  justify-content: flex-end;
+  min-width: 0;
+  flex-wrap: nowrap;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 140px;
+  flex: 1 1 240px;
+}
+
+.search-box input {
+  background: transparent;
+  border: none;
+  color: white;
+  outline: none;
+  min-width: 0;
+  font-size: 14px;
+}
+
+.icon {
+  color: #cbd5e1;
+  flex-shrink: 0;
+}
+
+.profile img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.topbar-menu {
+  display: none;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    position: sticky;
+    top: 0;
+    padding: 10px 14px;
+    margin: 10px 0 0 0;
+    gap: 10px;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .topbar-left {
+    width: auto;
+    flex: 1 1 auto;
+    justify-content: flex-start;
+  }
+
+  .search-box input {
+    min-width: 0;
+    width: 120px;
+  }
+
+  .topbar-menu {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .topbar-right {
+    width: auto;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: nowrap;
+    flex: 0 0 auto;
+  }
+
+  .search-box {
+    display: none;
+  }
+}

@@ -1,0 +1,240 @@
+.progress-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: #e5e7eb;
+}
+
+.progress-hero,
+.progress-card,
+.progress-stat,
+.progress-client-card {
+  background: rgba(17, 24, 39, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.25);
+}
+
+.progress-hero {
+  padding: 20px;
+}
+
+.progress-hero h1 {
+  margin: 6px 0;
+  font-size: 30px;
+  color: #f8fafc;
+}
+
+.progress-client-grid,
+.progress-stats,
+.progress-chart-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.progress-client-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.progress-stats {
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.progress-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+}
+
+.progress-stat span {
+  font-size: 13px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.progress-stat strong {
+  font-size: 28px;
+  color: #f8fafc;
+}
+
+.progress-client-card {
+  padding: 16px;
+  text-align: left;
+  cursor: pointer;
+  color: #e5e7eb;
+}
+
+.progress-client-card strong {
+  display: block;
+  color: #f8fafc;
+}
+
+.progress-client-card span,
+.progress-client-card small,
+.progress-client-card p {
+  display: block;
+  margin-top: 6px;
+  color: #94a3b8;
+}
+
+.progress-client-card--active {
+  border-color: rgba(56, 189, 248, 0.45);
+  background: rgba(56, 189, 248, 0.12);
+}
+
+.progress-layout,
+.progress-chart-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.progress-layout {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+}
+
+.progress-chart-grid {
+  display: grid;
+}
+
+.progress-card {
+  padding: 18px;
+}
+
+.progress-card__head {
+  margin-bottom: 16px;
+}
+
+.progress-card__head h2 {
+  margin: 0;
+  color: #f8fafc;
+}
+
+.progress-card__head p {
+  margin: 6px 0 0;
+  color: #94a3b8;
+}
+
+.progress-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.progress-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progress-field span {
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.progress-field input,
+.progress-field select {
+  min-height: 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.7);
+  color: #e5e7eb;
+  padding: 10px 12px;
+  outline: none;
+}
+
+.progress-field input:focus,
+.progress-field select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.progress-bmi-preview {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.progress-bmi-preview span {
+  color: #94a3b8;
+}
+
+.progress-bmi-preview strong {
+  font-size: 22px;
+  color: #f8fafc;
+}
+
+.progress-primary,
+.progress-history__row button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.progress-primary {
+  background: linear-gradient(135deg, #38bdf8, #2563eb);
+  color: #fff;
+}
+
+.progress-history {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.progress-history__row {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr 0.9fr 0.8fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.progress-history__row--user {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.progress-history__row span {
+  color: #cbd5e1;
+}
+
+.progress-history__row button {
+  background: rgba(59, 130, 246, 0.16);
+  color: #bfdbfe;
+  padding: 0 14px;
+}
+
+.progress-chart {
+  height: 300px;
+}
+
+.progress-empty {
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+@media (max-width: 980px) {
+  .progress-layout,
+  .progress-chart-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .progress-history__row,
+  .progress-history__row--user {
+    grid-template-columns: 1fr 1fr;
+  }
+}
