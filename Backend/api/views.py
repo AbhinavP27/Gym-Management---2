@@ -14,9 +14,15 @@ class ProfileViewSet(viewsets.ModelViewSet):
     serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get', 'patch'])
     def me(self, request):
         profile = request.user.profile
+        if request.method.lower() == 'patch':
+            serializer = self.get_serializer(profile, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+
         serializer = self.get_serializer(profile)
         return Response(serializer.data)
 
@@ -75,6 +81,63 @@ class WorkoutPlanViewSet(viewsets.ModelViewSet):
     queryset = WorkoutPlan.objects.all()
     serializer_class = WorkoutPlanSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.profile.role == 'ADMIN':
+            return WorkoutPlan.objects.all()
+        if user.profile.role == 'TRAINER':
+            return WorkoutPlan.objects.filter(member__trainer__profile__user=user)
+        return WorkoutPlan.objects.filter(member__profile__user=user)
+
+    def create(self, request, *args, **kwargs):
+        member_id = request.data.get('member')
+        plan_data = request.data.get('data', {}) or {}
+
+        if not member_id:
+            return Response({'member': 'Member ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        member = Member.objects.filter(id=member_id).first()
+        if not member:
+            return Response({'member': 'Member not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        if request.user.profile.role == 'TRAINER' and member.trainer and member.trainer.profile.user != request.user:
+            return Response({'detail': 'You are not allowed to assign workouts for this member.'}, status=status.HTTP_403_FORBIDDEN)
+
+        trainer_instance = None
+        if request.user.profile.role == 'TRAINER':
+            trainer_instance = Trainer.objects.filter(profile__user=request.user).first()
+            if member.trainer and member.trainer.profile.user != request.user:
+                return Response({'detail': 'You are not allowed to assign workouts for this member.'}, status=status.HTTP_403_FORBIDDEN)
+
+        workout_plan, created = WorkoutPlan.objects.get_or_create(
+            member=member,
+            defaults={
+                'trainer': member.trainer or trainer_instance,
+                'data': {'groups': {}},
+            },
+        )
+
+        existing_groups = workout_plan.data.get('groups', {}) if isinstance(workout_plan.data, dict) else {}
+        next_groups = {**existing_groups}
+
+        incoming_groups = plan_data.get('groups') if isinstance(plan_data, dict) else None
+        if incoming_groups and isinstance(incoming_groups, dict):
+            for group_id, group_payload in incoming_groups.items():
+                if group_payload and isinstance(group_payload, dict) and group_payload.get('workouts'):
+                    next_groups[group_id] = group_payload
+                else:
+                    next_groups.pop(group_id, None)
+        else:
+            next_groups = {}
+
+        workout_plan.data = {'groups': next_groups}
+        if request.user.profile.role == 'TRAINER' and trainer_instance:
+            workout_plan.trainer = member.trainer or trainer_instance
+        workout_plan.save()
+
+        serializer = self.get_serializer(workout_plan)
+        return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
 
 class DietPlanViewSet(viewsets.ModelViewSet):
     queryset = DietPlan.objects.all()

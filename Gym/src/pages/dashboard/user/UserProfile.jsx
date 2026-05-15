@@ -120,7 +120,7 @@ const UserProfile = ({ userId: userIdProp = null }) => {
     }));
   };
 
-  const handleProfileSave = (event) => {
+  const handleProfileSave = async (event) => {
     event.preventDefault();
 
     if (!member) {
@@ -144,7 +144,7 @@ const UserProfile = ({ userId: userIdProp = null }) => {
       return;
     }
 
-    const result = updateMemberProfile(member.id, profileForm);
+    const result = await updateMemberProfile(member.id, profileForm);
     if (!result?.ok) {
       toast.error(result?.error || "Unable to update profile.");
       return;

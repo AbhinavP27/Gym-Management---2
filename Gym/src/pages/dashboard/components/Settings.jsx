@@ -1,26 +1,37 @@
 import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import DashboardLayout from "../layouts/DashboardLayout";
 import { FaUser, FaShieldAlt, FaCog } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { useAuth } from "../../../context/AuthContext";
+import { useMembers } from "../../../context/MemberContext";
+import api from "../../../services/api";
 import "./styl/Settings.css";
 
 const Settings = ({ role }) => {
-  const { currentUser, login } = useAuth();
+  const { currentUser, updateCurrentUser } = useAuth();
+  const { userId: userIdParam } = useParams();
+  const { getMemberById, updateMemberProfile } = useMembers();
+  const userMemberId = Number(userIdParam);
+  const memberRecord = role === "user" ? getMemberById(userMemberId) : null;
   const [activeTab, setActiveTab] = useState("profile");
 
-  const names = (currentUser?.name || "John Doe").split(" ");
+  const accountName =
+    currentUser?.name ||
+    `${currentUser?.first_name || ""} ${currentUser?.last_name || ""}`.trim();
+  const displayName = memberRecord?.name || accountName || "John Doe";
+  const names = displayName.split(" ");
   const currentFirstName = names[0] || "";
   const currentLastName = names.slice(1).join(" ") || "";
 
   const [profile, setProfile] = useState({
     firstName: currentFirstName,
     lastName: currentLastName,
-    phone: currentUser?.phone || "",
+    phone: memberRecord?.phone || currentUser?.phone || "",
   });
 
   const [security, setSecurity] = useState({
-    email: currentUser?.email || "",
+    email: memberRecord?.email || currentUser?.email || "",
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
@@ -46,6 +57,32 @@ const Settings = ({ role }) => {
     localStorage.setItem("app-theme", preferences.theme);
   }, [preferences.theme]);
 
+  useEffect(() => {
+    const latestAccountName =
+      currentUser?.name ||
+      `${currentUser?.first_name || ""} ${currentUser?.last_name || ""}`.trim();
+    const latestDisplayName = memberRecord?.name || latestAccountName || "John Doe";
+    const latestNames = latestDisplayName.split(" ");
+    setProfile({
+      firstName: latestNames[0] || "",
+      lastName: latestNames.slice(1).join(" ") || "",
+      phone: memberRecord?.phone || currentUser?.phone || "",
+    });
+    setSecurity((previous) => ({
+      ...previous,
+      email: memberRecord?.email || currentUser?.email || "",
+    }));
+  }, [
+    currentUser?.email,
+    currentUser?.name,
+    currentUser?.first_name,
+    currentUser?.last_name,
+    currentUser?.phone,
+    memberRecord?.email,
+    memberRecord?.name,
+    memberRecord?.phone,
+  ]);
+
   const handleProfileChange = (e) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
   };
@@ -60,30 +97,89 @@ const Settings = ({ role }) => {
     setPreferences({ ...preferences, [e.target.name]: value });
   };
 
-  const saveProfile = (e) => {
+  const saveProfile = async (e) => {
     e.preventDefault();
-    if (currentUser) {
-      login({ ...currentUser, name: `${profile.firstName} ${profile.lastName}`.trim(), phone: profile.phone });
+    const nextName = `${profile.firstName} ${profile.lastName}`.trim();
+
+    if (role === "user" && memberRecord) {
+      const result = await updateMemberProfile(memberRecord.id, {
+        name: nextName,
+        phone: profile.phone,
+      });
+      if (!result?.ok) {
+        toast.error(result?.error || "Unable to save profile.");
+        return;
+      }
+    } else {
+      try {
+        await api.patch("profiles/me/", {
+          name: nextName,
+          phone: profile.phone,
+        });
+      } catch (error) {
+        toast.error(error.response?.data?.detail || "Unable to save profile.");
+        return;
+      }
     }
+
+    const nameParts = nextName.split(" ").filter(Boolean);
+    updateCurrentUser({
+      name: nextName,
+      first_name: nameParts[0] || "",
+      last_name: nameParts.slice(1).join(" "),
+      phone: profile.phone,
+    });
     toast.success("Profile updated successfully!");
   };
 
-  const saveEmailData = (e) => {
+  const saveEmailData = async (e) => {
     e.preventDefault();
-    if (currentUser) {
-      login({ ...currentUser, email: security.email });
+
+    if (role === "user" && memberRecord) {
+      const result = await updateMemberProfile(memberRecord.id, {
+        email: security.email,
+      });
+      if (!result?.ok) {
+        toast.error(result?.error || "Unable to update email.");
+        return;
+      }
+    } else {
+      try {
+        await api.patch("profiles/me/", {
+          email: security.email,
+        });
+      } catch (error) {
+        toast.error(error.response?.data?.detail || "Unable to update email.");
+        return;
+      }
     }
+
+    updateCurrentUser({ email: security.email, username: security.email });
     toast.success("Email update link sent!");
   };
 
-  const savePasswordData = (e) => {
+  const savePasswordData = async (e) => {
     e.preventDefault();
-    if(security.newPassword !== security.confirmPassword) {
+    if (security.newPassword !== security.confirmPassword) {
       toast.error("Passwords do not match");
       return;
     }
-    toast.success("Password changed successfully!");
-    setSecurity({...security, currentPassword: '', newPassword: '', confirmPassword: ''});
+
+    try {
+      await api.patch("profiles/me/", {
+        current_password: security.currentPassword,
+        new_password: security.newPassword,
+      });
+      toast.success("Password changed successfully!");
+      setSecurity({ ...security, currentPassword: "", newPassword: "", confirmPassword: "" });
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.current_password ||
+        error.response?.data?.new_password ||
+        error.response?.data?.detail ||
+        "Unable to change password.";
+      toast.error(errorMessage);
+    }
   };
 
   return (

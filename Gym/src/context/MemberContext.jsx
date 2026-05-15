@@ -44,14 +44,17 @@ export const MemberProvider = ({ children }) => {
 
   const updateMemberProfile = async (memberId, updates) => {
     try {
-      // Logic for updating user profile details would happen here via the API
-      // For now, updating member-specific fields
       await api.patch(`members/${memberId}/`, updates);
-      fetchMembers();
+      await fetchMembers();
       return { ok: true };
     } catch (error) {
       console.error("Failed to update profile", error);
-      return { ok: false, error: "Failed to update profile" };
+      return {
+        ok: false,
+        error:
+          error.response?.data?.detail ||
+          "Failed to update profile",
+      };
     }
   };
 
@@ -64,6 +67,18 @@ export const MemberProvider = ({ children }) => {
       fetchMembers();
     } catch (error) {
       console.error("Failed to remove feedback", error);
+    }
+  };
+
+  const switchMemberTrainer = async (memberId, trainer) => {
+    try {
+      if (!trainer?.id) {
+        throw new Error("Invalid trainer selected.");
+      }
+      await api.patch(`members/${memberId}/`, { trainer: trainer.id });
+      fetchMembers();
+    } catch (error) {
+      console.error("Failed to switch trainer", error);
     }
   };
 
@@ -89,21 +104,40 @@ export const MemberProvider = ({ children }) => {
   const getMemberById = (memberId) =>
     memberRecords.find((member) => member.id === Number(memberId)) ?? null;
 
+  const isEmailTaken = (email) => {
+    const normalizedEmail = String(email ?? "").trim().toLowerCase();
+    if (!normalizedEmail) return false;
+    return memberRecords.some(
+      (member) => member.email?.trim().toLowerCase() === normalizedEmail
+    );
+  };
+
   const registerMember = async (memberData) => {
     try {
       // This would ideally call a custom registration endpoint
       // For now, we'll assume a standard POST to members/
       const response = await api.post("members/", memberData);
-      fetchMembers();
+      if (currentUser) {
+        fetchMembers();
+      }
       return {
         ok: true,
         member: response.data,
       };
     } catch (error) {
       console.error("Registration failed", error);
+      const errorData = error.response?.data;
+      const parsedError =
+        typeof errorData === "string"
+          ? errorData
+          : errorData?.detail ||
+            Object.values(errorData ?? {})
+              .flat()
+              .join(" ")
+              .trim();
       return {
         ok: false,
-        error: error.response?.data?.detail || "Registration failed",
+        error: parsedError || "Registration failed",
       };
     }
   };
@@ -114,8 +148,10 @@ export const MemberProvider = ({ children }) => {
       allMembers: memberRecords,
       loading,
       getMemberById,
+      isEmailTaken,
       registerMember,
       updateMemberPlan,
+      switchMemberTrainer,
       updateMemberProfile,
       deleteMemberAccount,
       removeMemberFeedback,

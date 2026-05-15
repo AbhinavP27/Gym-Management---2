@@ -36,9 +36,11 @@ const UserPlan = ({ userId: userIdProp = null }) => {
       return;
     }
 
+    const selectedPlan = plans.find((plan) => plan.name === planName);
     const result = submitPlanChangeRequest({
       member,
       requestedPlan: planName,
+      requestedPlanId: selectedPlan?.id ?? null,
     });
 
     if (!result?.ok) {

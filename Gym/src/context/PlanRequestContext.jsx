@@ -44,7 +44,9 @@ const normalizePlanRequest = (request) => ({
   trainerId: request.trainerId == null ? null : Number(request.trainerId),
   trainerName: request.trainerName?.trim() ?? "",
   currentPlan: request.currentPlan?.trim() ?? "",
+  currentPlanId: request.currentPlanId == null ? null : Number(request.currentPlanId),
   requestedPlan: request.requestedPlan?.trim() ?? "",
+  requestedPlanId: request.requestedPlanId == null ? null : Number(request.requestedPlanId),
   currentTrainerId:
     request.currentTrainerId == null ? null : Number(request.currentTrainerId),
   currentTrainerName: request.currentTrainerName?.trim() ?? "",
@@ -132,7 +134,7 @@ export const PlanRequestProvider = ({ children }) => {
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
-  const submitPlanChangeRequest = ({ member, requestedPlan }) => {
+  const submitPlanChangeRequest = ({ member, requestedPlan, requestedPlanId = null }) => {
     if (!member) {
       return {
         ok: false,
@@ -177,7 +179,9 @@ export const PlanRequestProvider = ({ children }) => {
       trainerId: member.trainerId,
       trainerName: member.trainer,
       currentPlan: member.plan,
+      currentPlanId: member.planId ?? null,
       requestedPlan,
+      requestedPlanId,
       status: "pending",
       adminDecision: "pending",
       trainerDecision: "pending",
@@ -357,6 +361,7 @@ export const PlanRequestProvider = ({ children }) => {
             approvedPlanChange = {
               memberId: nextRequest.memberId,
               requestedPlan: nextRequest.requestedPlan,
+              requestedPlanId: nextRequest.requestedPlanId,
             };
           }
         }
@@ -372,7 +377,10 @@ export const PlanRequestProvider = ({ children }) => {
     );
 
     if (approvedPlanChange) {
-      updateMemberPlan(approvedPlanChange.memberId, approvedPlanChange.requestedPlan);
+      updateMemberPlan(
+        approvedPlanChange.memberId,
+        approvedPlanChange.requestedPlanId ?? approvedPlanChange.requestedPlan
+      );
     }
 
     if (approvedTrainerChange) {

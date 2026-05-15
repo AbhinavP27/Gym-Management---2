@@ -30,9 +30,14 @@ export const AuthProvider = ({ children }) => {
       // Fetch Profile
       const profileResponse = await api.get("profiles/me/");
       const rawData = profileResponse.data;
+      const computedName = rawData.name || `${rawData.user?.first_name || ""} ${rawData.user?.last_name || ""}`.trim() || rawData.user?.username || "";
       
       const userData = {
           ...rawData.user,
+          name: computedName,
+          phone: rawData.phone || "",
+          address: rawData.address || "",
+          gender: rawData.gender || "",
           role: roleMap[rawData.role] || 'user', // Normalize to lowercase
           id: rawData.member_id || rawData.trainer_id || rawData.id // Use entity specific ID
       };
@@ -55,8 +60,19 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("refreshToken");
   };
 
+  const updateCurrentUser = (updates) => {
+    setCurrentUser((previous) => {
+      if (!previous) {
+        return previous;
+      }
+      const nextUser = { ...previous, ...updates };
+      localStorage.setItem("currentUser", JSON.stringify(nextUser));
+      return nextUser;
+    });
+  };
+
   return (
-    <AuthContext.Provider value={{ currentUser, login, logout, loading }}>
+    <AuthContext.Provider value={{ currentUser, login, logout, updateCurrentUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

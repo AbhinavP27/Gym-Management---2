@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { workoutLibrary } from "../data/workoutLibrary";
+import api from "../services/api";
+import { useAuth } from "./AuthContext";
 
 const STORAGE_KEY = "urbangrind-member-workouts";
 const WorkoutPlanContext = createContext(null);
@@ -38,6 +40,43 @@ const normalizeStoredPlans = (plans) => {
   }, {});
 };
 
+const normalizeApiPlans = (plans) => {
+  if (!Array.isArray(plans)) {
+    return {};
+  }
+
+  return plans.reduce((accumulator, plan) => {
+    if (!plan || typeof plan !== "object" || !plan.member) {
+      return accumulator;
+    }
+
+    const groups = plan?.data?.groups && typeof plan.data.groups === "object" && !Array.isArray(plan.data.groups)
+      ? Object.entries(plan.data.groups).reduce((groupAccumulator, [groupId, group]) => {
+          if (!group || typeof group !== "object") {
+            return groupAccumulator;
+          }
+          groupAccumulator[groupId] = {
+            muscleId: group?.muscleId ?? groupId,
+            muscleName: group?.muscleName ?? groupId,
+            description: group?.description ?? "",
+            workouts: Array.isArray(group?.workouts) ? group.workouts : [],
+          };
+          return groupAccumulator;
+        }, {})
+      : {};
+
+    accumulator[String(plan.member)] = {
+      id: plan.id,
+      userId: Number(plan.member),
+      trainerId: plan.trainer ?? null,
+      updatedAt: plan.updated_at ?? plan.updatedAt ?? null,
+      groups,
+    };
+
+    return accumulator;
+  }, {});
+};
+
 const loadWorkoutPlans = () => {
   if (typeof window === "undefined") {
     return {};
@@ -56,7 +95,26 @@ const loadWorkoutPlans = () => {
 };
 
 export const WorkoutPlanProvider = ({ children }) => {
+  const { currentUser } = useAuth();
   const [plansByMember, setPlansByMember] = useState(() => loadWorkoutPlans());
+
+  useEffect(() => {
+    if (!currentUser) {
+      return;
+    }
+
+    const fetchPlans = async () => {
+      try {
+        const response = await api.get("workouts/");
+        const serverPlans = normalizeApiPlans(response.data);
+        setPlansByMember(serverPlans);
+      } catch (error) {
+        console.error("Failed to load workout plans", error);
+      }
+    };
+
+    fetchPlans();
+  }, [currentUser]);
 
   useEffect(() => {
     try {
@@ -79,39 +137,47 @@ export const WorkoutPlanProvider = ({ children }) => {
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
-  const assignWorkouts = ({ userId, trainerId, muscleGroup, workouts }) => {
+  const assignWorkouts = async ({ userId, trainerId, muscleGroup, workouts }) => {
     const memberKey = String(userId);
+    const currentPlan = plansByMember[memberKey] ?? {
+      userId,
+      trainerId,
+      updatedAt: null,
+      groups: {},
+    };
+    const nextGroups = { ...currentPlan.groups };
 
-    setPlansByMember((current) => {
-      const currentPlan = current[memberKey] ?? {
-        userId,
-        trainerId,
-        updatedAt: null,
-        groups: {},
+    if (workouts.length > 0) {
+      nextGroups[muscleGroup.id] = {
+        muscleId: muscleGroup.id,
+        muscleName: muscleGroup.name,
+        description: muscleGroup.description ?? "",
+        workouts,
       };
-      const nextGroups = { ...currentPlan.groups };
+    } else {
+      delete nextGroups[muscleGroup.id];
+    }
 
-      if (workouts.length > 0) {
-        nextGroups[muscleGroup.id] = {
-          muscleId: muscleGroup.id,
-          muscleName: muscleGroup.name,
-          description: muscleGroup.description ?? "",
-          workouts,
-        };
-      } else {
-        delete nextGroups[muscleGroup.id];
-      }
+    const nextPlan = {
+      userId,
+      trainerId,
+      updatedAt: new Date().toISOString(),
+      groups: nextGroups,
+    };
 
-      return {
+    try {
+      await api.post("workouts/", {
+        member: userId,
+        data: { groups: nextGroups },
+      });
+      setPlansByMember((current) => ({
         ...current,
-        [memberKey]: {
-          userId,
-          trainerId,
-          updatedAt: new Date().toISOString(),
-          groups: nextGroups,
-        },
-      };
-    });
+        [memberKey]: nextPlan,
+      }));
+    } catch (error) {
+      console.error("Failed to save workout plan", error);
+      throw error;
+    }
   };
 
   const value = useMemo(

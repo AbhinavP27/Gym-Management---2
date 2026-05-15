@@ -10,7 +10,7 @@ const Reg = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { plans } = useMembershipPlans();
-    const { registerMember, isEmailTaken } = useMembers();
+    const { registerMember, isEmailTaken = () => false } = useMembers();
     const { trainers } = useTrainerDirectory();
     const [form, setForm] = useState({
         fullName: "",
@@ -24,17 +24,34 @@ const Reg = () => {
     });
     const [errors, setErrors] = useState({});
     const [showPassword, setShowPassword] = useState(false);
-    const selectedPlan = plans.find((plan) => plan.name === form.plan);
-    const needsTrainer = Boolean(selectedPlan?.trainerRequired);
+    const selectedPlan = plans.find((plan) => {
+        const formPlan = String(form.plan).trim().toLowerCase();
+        if (!formPlan) return false;
+        return String(plan.id) === String(form.plan) ||
+            String(plan.name).toLowerCase() === formPlan;
+    });
+    const planRequiresTrainer = (planConfig, selectedPlanName) => {
+        if (typeof planConfig?.trainerRequired === "boolean") {
+            return planConfig.trainerRequired;
+        }
+        const normalizedName = String(planConfig?.name ?? selectedPlanName ?? "")
+            .trim()
+            .toLowerCase();
+        return normalizedName.includes("gold") || normalizedName.includes("diamond");
+    };
+    const needsTrainer = planRequiresTrainer(selectedPlan, form.plan);
 
     useEffect(() => {
         const incomingPlan = location.state?.plan;
         if (!incomingPlan) return;
-        const incomingPlanConfig = plans.find((plan) => plan.name === incomingPlan);
+        const incomingPlanConfig = plans.find(
+            (plan) => String(plan.name).toLowerCase() === String(incomingPlan).toLowerCase()
+        );
 
         setForm((prev) => {
-            const next = { ...prev, plan: incomingPlan };
-            if (!incomingPlanConfig?.trainerRequired) {
+            const nextPlanValue = incomingPlanConfig?.id ?? incomingPlan;
+            const next = { ...prev, plan: nextPlanValue };
+            if (!planRequiresTrainer(incomingPlanConfig, nextPlanValue)) {
                 next.trainer = "";
             }
             return next;
@@ -64,8 +81,14 @@ const Reg = () => {
         const { name, value } = e.target;
         setForm((prev) => {
             const next = { ...prev, [name]: value };
-            const nextPlan = name === "plan" ? plans.find((plan) => plan.name === value) : selectedPlan;
-            if (name === "plan" && !nextPlan?.trainerRequired) {
+            const nextPlan =
+                name === "plan"
+                    ? plans.find((plan) =>
+                        String(plan.id) === String(value) ||
+                        String(plan.name).toLowerCase() === String(value).toLowerCase()
+                    )
+                    : selectedPlan;
+            if (name === "plan" && !planRequiresTrainer(nextPlan, value)) {
                 next.trainer = "";
             }
             return next;
@@ -101,7 +124,7 @@ const Reg = () => {
         return newErrors;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const validationErrors = validate();
         setErrors(validationErrors);
@@ -109,15 +132,15 @@ const Reg = () => {
         const selectedTrainer = trainers.find(
             (trainer) => String(trainer.id) === String(form.trainer)
         );
-        const result = registerMember({
+        const result = await registerMember({
             name: form.fullName,
             email: form.email,
             password: form.password,
             phone: form.phone,
             gender: form.gender,
-            plan: form.plan,
+            plan: selectedPlan?.id ?? form.plan,
             trainerId: needsTrainer ? selectedTrainer?.id ?? null : null,
-            trainer: needsTrainer ? selectedTrainer?.name ?? "" : "",
+            trainer: needsTrainer ? selectedTrainer?.id ?? null : null,
         });
 
         if (!result.ok) {
@@ -247,7 +270,7 @@ const Reg = () => {
                             <select name="plan" value={form.plan} onChange={handleChange} className="select-visible">
                                 <option value="">Select membership</option>
                                 {plans.map((plan) => (
-                                    <option key={plan.id} value={plan.name}>
+                                    <option key={plan.id} value={plan.id}>
                                         {plan.name}
                                     </option>
                                 ))}

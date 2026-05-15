@@ -145,7 +145,7 @@ const Workouts = ({ trainerId: trainerIdProp = null }) => {
     updateCurrentSelection([]);
   };
 
-  const handleAssign = () => {
+  const handleAssign = async () => {
     if (!selectedMember || !activeMuscle) {
       toast.error("Select a member and muscle group first.");
       return;
@@ -155,18 +155,22 @@ const Workouts = ({ trainerId: trainerIdProp = null }) => {
       selectedWorkoutIds.includes(workout.id)
     );
 
-    assignWorkouts({
-      userId: selectedMember.id,
-      trainerId,
-      muscleGroup: activeMuscle,
-      workouts: selectedWorkouts,
-    });
+    try {
+      await assignWorkouts({
+        userId: selectedMember.id,
+        trainerId,
+        muscleGroup: activeMuscle,
+        workouts: selectedWorkouts,
+      });
 
-    toast.success(
-      selectedWorkouts.length
-        ? `${selectedWorkouts.length} ${activeMuscle.name.toLowerCase()} workouts saved for ${selectedMember.name}.`
-        : `${activeMuscle.name} workouts cleared for ${selectedMember.name}.`
-    );
+      toast.success(
+        selectedWorkouts.length
+          ? `${selectedWorkouts.length} ${activeMuscle.name.toLowerCase()} workouts saved for ${selectedMember.name}.`
+          : `${activeMuscle.name} workouts cleared for ${selectedMember.name}.`
+      );
+    } catch (error) {
+      toast.error("Unable to save workouts. Please try again.");
+    }
   };
 
   if (!trainerMembers.length) {
