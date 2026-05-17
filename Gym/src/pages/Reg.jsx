@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { useMembershipPlans } from "../context/MembershipContext";
 import { useMembers } from "../context/MemberContext";
 import { useTrainerDirectory } from "../context/TrainerContext";
+import { usePlanRequests } from "../context/PlanRequestContext";
 import "./styles/Login.css";
 
 const Reg = () => {
@@ -12,6 +13,7 @@ const Reg = () => {
     const { plans } = useMembershipPlans();
     const { registerMember, isEmailTaken = () => false } = useMembers();
     const { trainers } = useTrainerDirectory();
+    const { submitRegistrationApprovalRequests } = usePlanRequests();
     const [form, setForm] = useState({
         fullName: "",
         email: "",
@@ -30,16 +32,6 @@ const Reg = () => {
         return String(plan.id) === String(form.plan) ||
             String(plan.name).toLowerCase() === formPlan;
     });
-    const planRequiresTrainer = (planConfig, selectedPlanName) => {
-        if (typeof planConfig?.trainerRequired === "boolean") {
-            return planConfig.trainerRequired;
-        }
-        const normalizedName = String(planConfig?.name ?? selectedPlanName ?? "")
-            .trim()
-            .toLowerCase();
-        return normalizedName.includes("gold") || normalizedName.includes("diamond");
-    };
-    const needsTrainer = planRequiresTrainer(selectedPlan, form.plan);
 
     useEffect(() => {
         const incomingPlan = location.state?.plan;
@@ -51,9 +43,7 @@ const Reg = () => {
         setForm((prev) => {
             const nextPlanValue = incomingPlanConfig?.id ?? incomingPlan;
             const next = { ...prev, plan: nextPlanValue };
-            if (!planRequiresTrainer(incomingPlanConfig, nextPlanValue)) {
-                next.trainer = "";
-            }
+            next.trainer = "";
             return next;
         });
 
@@ -81,14 +71,7 @@ const Reg = () => {
         const { name, value } = e.target;
         setForm((prev) => {
             const next = { ...prev, [name]: value };
-            const nextPlan =
-                name === "plan"
-                    ? plans.find((plan) =>
-                        String(plan.id) === String(value) ||
-                        String(plan.name).toLowerCase() === String(value).toLowerCase()
-                    )
-                    : selectedPlan;
-            if (name === "plan" && !planRequiresTrainer(nextPlan, value)) {
+            if (name === "plan") {
                 next.trainer = "";
             }
             return next;
@@ -117,10 +100,6 @@ const Reg = () => {
 
         if (!form.gender) newErrors.gender = "Select a gender option";
 
-        if (!form.plan) newErrors.plan = "Choose a membership";
-
-        if (needsTrainer && !form.trainer) newErrors.trainer = "Pick a trainer for plans that require one";
-
         return newErrors;
     };
 
@@ -129,18 +108,15 @@ const Reg = () => {
         const validationErrors = validate();
         setErrors(validationErrors);
         if (Object.keys(validationErrors).length) return;
-        const selectedTrainer = trainers.find(
-            (trainer) => String(trainer.id) === String(form.trainer)
-        );
         const result = await registerMember({
             name: form.fullName,
             email: form.email,
             password: form.password,
             phone: form.phone,
             gender: form.gender,
-            plan: selectedPlan?.id ?? form.plan,
-            trainerId: needsTrainer ? selectedTrainer?.id ?? null : null,
-            trainer: needsTrainer ? selectedTrainer?.id ?? null : null,
+            plan: null,
+            trainerId: null,
+            trainer: null,
         });
 
         if (!result.ok) {
@@ -148,8 +124,28 @@ const Reg = () => {
             return;
         }
 
+        const createdMember = result.member || {};
+
+        const approvalResult = submitRegistrationApprovalRequests({
+            member: {
+                ...createdMember,
+                name: createdMember.name || form.fullName,
+                email: createdMember.email || form.email,
+            },
+        });
+
+        if (!approvalResult.ok) {
+            console.error("Failed to create registration approval requests", approvalResult.error);
+        }
+
         navigate("/login");
-        toast.success("Registration successful! Use your email to log in.");
+        if (approvalResult.ok) {
+            toast.success(
+                "Registration successful! New client approval was sent to admin dashboard."
+            );
+        } else {
+            toast.success("Registration successful! Use your email to log in.");
+        }
         setForm({
             fullName: "",
             email: "",
@@ -265,36 +261,18 @@ const Reg = () => {
                             {errors.gender && <p className="error-text">{errors.gender}</p>}
                         </label>
 
-                        <label className="field">
+                        <label className="field disabled-field">
                             <span>Membership</span>
-                            <select name="plan" value={form.plan} onChange={handleChange} className="select-visible">
-                                <option value="">Select membership</option>
-                                {plans.map((plan) => (
-                                    <option key={plan.id} value={plan.id}>
-                                        {plan.name}
-                                    </option>
-                                ))}
+                            <select name="plan" value="" disabled className="select-visible">
+                                <option value="">Select in dashboard after admin approval</option>
                             </select>
-                            {errors.plan && <p className="error-text">{errors.plan}</p>}
                         </label>
 
-                        <label className={`field ${needsTrainer ? "" : "disabled-field"}`}>
+                        <label className="field disabled-field">
                             <span>Trainer</span>
-                            <select
-                                name="trainer"
-                                value={form.trainer}
-                                onChange={handleChange}
-                                disabled={!needsTrainer}
-                                className="select-visible"
-                            >
-                                <option value="">{needsTrainer ? "Select trainer" : "Trainer-supported plans only"}</option>
-                                {trainers.map((trainer) => (
-                                    <option key={trainer.id} value={trainer.id}>
-                                        {trainer.name}
-                                    </option>
-                                ))}
+                            <select name="trainer" value="" disabled className="select-visible">
+                                <option value="">Select in dashboard after admin approval</option>
                             </select>
-                            {errors.trainer && <p className="error-text">{errors.trainer}</p>}
                         </label>
                     </div>
 

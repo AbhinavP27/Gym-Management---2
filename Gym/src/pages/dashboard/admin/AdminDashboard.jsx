@@ -29,12 +29,18 @@ import {
 import { useTrainerDirectory } from "../../../context/TrainerContext";
 
 const getRequestHeadline = (request) =>
-  request.requestType === "trainer"
+  request.requestType === "new_client"
+    ? "Registration pending admin approval"
+    : request.requestType === "trainer"
     ? `${request.currentTrainerName || "No trainer"} to ${request.requestedTrainerName}`
     : `${request.currentPlan} to ${request.requestedPlan}`;
 
 const getRequestTypeLabel = (request) =>
-  request.requestType === "trainer" ? "Trainer Change" : "Plan Change";
+  request.requestType === "new_client"
+    ? "New Client"
+    : request.requestType === "trainer"
+    ? "Trainer Change"
+    : "Plan Change";
 
 const formatDateTime = (value) =>
   new Intl.DateTimeFormat("en-IN", {
@@ -142,8 +148,8 @@ const AdminDashboard = () => {
     toast.success("Feedback removed.");
   };
 
-  const handlePlanRequestReview = (requestId, decision) => {
-    const result = reviewApprovalRequest({
+  const handlePlanRequestReview = async (requestId, decision) => {
+    const result = await reviewApprovalRequest({
       requestId,
       actorRole: "admin",
       decision,
@@ -155,9 +161,16 @@ const AdminDashboard = () => {
     }
 
     if (decision === "approved") {
+      if (result.recovered) {
+        toast.success("Request was already approved. Member membership/trainer sync was retried.");
+        return;
+      }
+
       toast.success(
         result.applied
-          ? result.request?.requestType === "trainer"
+          ? result.request?.requestType === "new_client"
+            ? "Admin approved the new client request and membership is now active."
+            : result.request?.requestType === "trainer"
             ? "Admin approved the request and the trainer assignment was updated."
             : "Admin approved the request and the plan was updated."
           : "Admin approved the request. Waiting for trainer approval."
@@ -166,7 +179,9 @@ const AdminDashboard = () => {
     }
 
     toast.success(
-      result.request?.requestType === "trainer"
+      result.request?.requestType === "new_client"
+        ? "New client request rejected by admin."
+        : result.request?.requestType === "trainer"
         ? "Trainer change request rejected by admin."
         : "Plan change request rejected by admin."
     );
@@ -248,8 +263,10 @@ const AdminDashboard = () => {
                       <strong>{request.memberName}</strong>
                       <small>
                         {" "}
-                        {getRequestTypeLabel(request)} | {getRequestHeadline(request)} | Trainer:{" "}
-                        {request.trainerName || "Not assigned"}
+                        {getRequestTypeLabel(request)} | {getRequestHeadline(request)}
+                        {request.requestType !== "new_client" ? (
+                          <> | Trainer: {request.trainerName || "Not assigned"}</>
+                        ) : null}
                       </small>
                     </div>
                     <div className="admin-feedback-item__actions">
@@ -293,7 +310,9 @@ const AdminDashboard = () => {
                   ) : (
                     <small>
                       {request.status === "approved"
-                        ? request.requestType === "trainer"
+                        ? request.requestType === "new_client"
+                          ? "This new client is fully approved and now active."
+                          : request.requestType === "trainer"
                           ? "This request has been fully approved and the trainer assignment is now active."
                           : "This request has been fully approved and applied."
                         : request.status === "rejected"

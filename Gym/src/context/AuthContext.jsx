@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import api from "../services/api";
+import { AUTH_KEYS, clearAuthStorage, getAuthItem, setAuthItem } from "../utils/authStorage";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(() => {
-    const savedUser = localStorage.getItem("currentUser");
+    const savedUser = getAuthItem(AUTH_KEYS.currentUser);
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
@@ -24,8 +25,8 @@ export const AuthProvider = ({ children }) => {
       const response = await api.post("token/", { username: email, password });
       const { access, refresh } = response.data;
 
-      localStorage.setItem("accessToken", access);
-      localStorage.setItem("refreshToken", refresh);
+      setAuthItem(AUTH_KEYS.accessToken, access);
+      setAuthItem(AUTH_KEYS.refreshToken, refresh);
 
       // Fetch Profile
       const profileResponse = await api.get("profiles/me/");
@@ -43,7 +44,7 @@ export const AuthProvider = ({ children }) => {
       };
 
       setCurrentUser(userData);
-      localStorage.setItem("currentUser", JSON.stringify(userData));
+      setAuthItem(AUTH_KEYS.currentUser, JSON.stringify(userData));
       return { ok: true, user: userData };
     } catch (error) {
       console.error("Login failed", error);
@@ -55,9 +56,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setCurrentUser(null);
-    localStorage.removeItem("currentUser");
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+    clearAuthStorage();
   };
 
   const updateCurrentUser = (updates) => {
@@ -66,7 +65,7 @@ export const AuthProvider = ({ children }) => {
         return previous;
       }
       const nextUser = { ...previous, ...updates };
-      localStorage.setItem("currentUser", JSON.stringify(nextUser));
+      setAuthItem(AUTH_KEYS.currentUser, JSON.stringify(nextUser));
       return nextUser;
     });
   };

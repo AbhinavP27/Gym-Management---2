@@ -272,7 +272,7 @@ const Trainers = () => {
             <input
               name="email"
               type="email"
-              placeholder="Login Email (Optional)"
+              placeholder="Login Email "
               className="trainer-credentials-field"
               value={form.email}
               onChange={handleChange}
@@ -282,7 +282,7 @@ const Trainers = () => {
             <input
               name="password"
               type="text"
-              placeholder="Login Password (Optional)"
+              placeholder="Login Password "
               className="trainer-credentials-field"
               value={form.password}
               onChange={handleChange}

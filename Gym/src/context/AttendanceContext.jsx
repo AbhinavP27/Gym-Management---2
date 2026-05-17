@@ -38,8 +38,6 @@ const buildAttendanceRoster = (trainers, members) => {
     });
 
     members.forEach((member, index) => {
-      const charCode = date.charCodeAt(date.length - 1) || 0;
-      const seed = charCode + index;
       roster.push({
         id: `member-${member.id}-${date}`,
         userId: member.id,
@@ -47,7 +45,7 @@ const buildAttendanceRoster = (trainers, members) => {
         role: "member",
         trainerId: member.trainerId,
         date: date,
-        status: seed % 4 === 0 ? "Absent" : "Present", // Sometimes absent
+        status: "Absent",
       });
     });
   });

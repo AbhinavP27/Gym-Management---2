@@ -6,6 +6,7 @@ import { useMembers } from "../../../context/MemberContext";
 import { useWorkoutPlans } from "../../../context/WorkoutPlanContext";
 import { useDietPlans } from "../../../context/DietPlanContext";
 import { hasTrainerAccess } from "../../../utils/memberAccess";
+import { getDecisionLabel, usePlanRequests } from "../../../context/PlanRequestContext";
 import "../components/styl/DashboardOverview.css";
 import "../components/styl/WorkoutPlans.css";
 
@@ -27,10 +28,13 @@ const UserDashboard = ({ userId: userIdProp = null }) => {
   const { userId: userIdParam } = useParams();
   const { attendance } = useAttendance();
   const { members: memberRoster } = useMembers();
+  const { getMemberOnboardingRequest, isMemberOnboardingBlocked } = usePlanRequests();
   const { muscleGroups, plansByMember } = useWorkoutPlans();
   const { mealGroups, plansByMember: dietPlansByMember } = useDietPlans();
   const userId = Number(userIdParam ?? userIdProp);
   const member = memberRoster.find((item) => item.id === userId);
+  const onboardingRequest = getMemberOnboardingRequest(userId);
+  const isOnboardingBlocked = isMemberOnboardingBlocked(userId);
   const hasPremiumAccess = hasTrainerAccess(member?.plan);
   const memberPlan =
     plansByMember[String(userId)] ?? {
@@ -62,10 +66,52 @@ const UserDashboard = ({ userId: userIdProp = null }) => {
   const todayAttendance = attendance.find(
     (entry) => entry.role === "member" && entry.userId === userId
   );
+  const todayAttendanceValue = todayAttendance?.status === "Present" ? 1 : 0;
   const visibleWorkoutGroups = hasPremiumAccess ? workoutGroups : [];
   const visibleDietGroups = hasPremiumAccess ? dietGroups : [];
   const visibleWorkoutCount = hasPremiumAccess ? totalWorkouts : 0;
   const visibleDietCount = hasPremiumAccess ? totalDietItems : 0;
+
+  if (isOnboardingBlocked) {
+    return (
+      <DashboardLayout role="user">
+        <div className="dashboard-overview">
+          <div className="dashboard-overview__hero">
+            <div>
+              <p className="eyebrow">User Dashboard</p>
+              <h1>Approval Pending</h1>
+              <p className="subtext">
+                Your account is waiting for admin and trainer approval. Dashboard activity is
+                locked until approval is complete.
+              </p>
+            </div>
+            <span className={`pill ${onboardingRequest?.status === "rejected" ? "pill--red" : "pill--amber"}`}>
+              {getDecisionLabel(onboardingRequest?.status)}
+            </span>
+          </div>
+
+          <div className="dashboard-overview__stats">
+            <div className="overview-stat">
+              <span>Requested Membership</span>
+              <strong>{onboardingRequest?.requestedPlan || "N/A"}</strong>
+            </div>
+            <div className="overview-stat">
+              <span>Requested Trainer</span>
+              <strong>{onboardingRequest?.requestedTrainerName || "Not assigned"}</strong>
+            </div>
+            <div className="overview-stat">
+              <span>Admin Decision</span>
+              <strong>{getDecisionLabel(onboardingRequest?.adminDecision)}</strong>
+            </div>
+            <div className="overview-stat">
+              <span>Trainer Decision</span>
+              <strong>{getDecisionLabel(onboardingRequest?.trainerDecision)}</strong>
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout role="user">
@@ -100,7 +146,7 @@ const UserDashboard = ({ userId: userIdProp = null }) => {
           </div>
           <div className="overview-stat">
             <span>Today Attendance</span>
-            <strong>{todayAttendance?.status ?? "N/A"}</strong>
+            <strong>{todayAttendanceValue}</strong>
           </div>
         </div>
 
@@ -204,7 +250,7 @@ const UserDashboard = ({ userId: userIdProp = null }) => {
           <p className="subtext">
             Trainer update:{" "}
             <span className={`pill ${todayAttendance?.status === "Present" ? "pill--green" : "pill--amber"}`}>
-              {todayAttendance?.status ?? "Not marked"}
+              {todayAttendance?.status ?? "Absent"}
             </span>
           </p>
           <Link to={`/user/${userId}/attendance`} className="workout-link">

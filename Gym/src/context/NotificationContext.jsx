@@ -140,7 +140,12 @@ export const NotificationProvider = ({ children }) => {
       const isRecent = (todayTime - reqTime) <= fourteenDaysMs; // Track for 14 days
       if (!isRecent) return;
 
-      const typeLabel = req.requestType === "trainer" ? "Trainer Change" : "Membership Plan Change";
+      const typeLabel =
+        req.requestType === "new_client"
+          ? "New Client Approval"
+          : req.requestType === "trainer"
+          ? "Trainer Change"
+          : "Membership Plan Change";
 
       if (req.status === "pending") {
         if (currentUser.role === "admin") {

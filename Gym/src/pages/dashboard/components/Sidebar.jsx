@@ -5,13 +5,17 @@ import { sidebarConfig } from "../../../data/sidebarConfig";
 import { useMembers } from "../../../context/MemberContext";
 import { hasTrainerAccess } from "../../../utils/memberAccess";
 import { useAuth } from "../../../context/AuthContext";
+import { usePlanRequests } from "../../../context/PlanRequestContext";
 
 const Sidebar = ({ role , isMobile, isOpen, setIsOpen }) => {
   const { trainerId, userId } = useParams();
   const { getMemberById } = useMembers();
   const { logout } = useAuth();
+  const { isMemberOnboardingBlocked } = usePlanRequests();
   const member = role === "user" ? getMemberById(userId) : null;
   const hasPremiumAccess = hasTrainerAccess(member?.plan);
+  const isUserOnboardingBlocked =
+    role === "user" && userId ? isMemberOnboardingBlocked(userId) : false;
 
   const handleClose = () => {
     if (isMobile) setIsOpen(false);
@@ -22,7 +26,9 @@ const Sidebar = ({ role , isMobile, isOpen, setIsOpen }) => {
     handleClose();
   };
 
-  const menuItems = sidebarConfig[role] || [];
+  const menuItems = isUserOnboardingBlocked
+    ? (sidebarConfig[role] || []).filter((item) => item.path === "/user")
+    : sidebarConfig[role] || [];
   const resolvePath = (path) => {
     if (role === "trainer" && trainerId && path.startsWith("/trainer")) {
       return path.replace("/trainer", `/trainer/${trainerId}`);

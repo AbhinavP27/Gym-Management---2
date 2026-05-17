@@ -187,7 +187,7 @@ const UserProfile = ({ userId: userIdProp = null }) => {
     toast.success(`Trainer change request sent to ${selectedTrainer.name} and admin.`);
   };
 
-  const handleFeedbackSubmit = (event) => {
+  const handleFeedbackSubmit = async (event) => {
     event.preventDefault();
 
     if (!member) {
@@ -199,7 +199,11 @@ const UserProfile = ({ userId: userIdProp = null }) => {
       return;
     }
 
-    addMemberFeedback(member.id, feedbackForm);
+    const result = await addMemberFeedback(member.id, feedbackForm);
+    if (!result?.ok) {
+      toast.error(result?.error || "Unable to submit feedback.");
+      return;
+    }
     setFeedbackForm(createFeedbackForm());
     toast.success("Feedback sent to admin.");
   };

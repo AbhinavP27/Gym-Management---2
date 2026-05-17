@@ -1,9 +1,11 @@
 import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { usePlanRequests } from "../context/PlanRequestContext";
 
 const ProtectedRoute = ({ allowedRoles }) => {
   const { currentUser } = useAuth();
+  const { isMemberOnboardingBlocked } = usePlanRequests();
   const location = useLocation();
 
   if (!currentUser) {
@@ -20,6 +22,12 @@ const ProtectedRoute = ({ allowedRoles }) => {
     const match = location.pathname.match(/^\/user\/([^/]+)/);
     if (match && match[1] !== String(currentUser.id)) {
       return <Navigate to={`/user/${currentUser.id}`} replace />;
+    }
+
+    const isBlocked = isMemberOnboardingBlocked(currentUser.id);
+    const userHomePath = `/user/${currentUser.id}`;
+    if (isBlocked && location.pathname !== userHomePath) {
+      return <Navigate to={userHomePath} replace />;
     }
   }
 

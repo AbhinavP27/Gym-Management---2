@@ -1,4 +1,5 @@
 import axios from "axios";
+import { AUTH_KEYS, clearAuthStorage, getAuthItem } from "../utils/authStorage";
 
 const API_BASE_URL = "http://localhost:8000/api/";
 
@@ -12,7 +13,7 @@ const api = axios.create({
 // Add a request interceptor to include JWT token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("accessToken");
+    const token = getAuthItem(AUTH_KEYS.accessToken);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -35,8 +36,7 @@ api.interceptors.response.use(
       }
       
       originalRequest._retry = true;
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("currentUser");
+      clearAuthStorage();
       window.location.href = "/login";
     }
     return Promise.reject(error);

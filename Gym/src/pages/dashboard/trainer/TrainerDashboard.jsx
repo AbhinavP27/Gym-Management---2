@@ -18,12 +18,18 @@ import "../components/styl/WorkoutPlans.css";
 import "../components/styl/Profile.css";
 
 const getRequestHeadline = (request) =>
-  request.requestType === "trainer"
+  request.requestType === "new_client"
+    ? `Membership: ${request.requestedPlan || "Not selected"} | Trainer: ${request.requestedTrainerName || "Not assigned"}`
+    : request.requestType === "trainer"
     ? `${request.currentTrainerName || "No trainer"} to ${request.requestedTrainerName}`
     : `${request.currentPlan} to ${request.requestedPlan}`;
 
 const getRequestTypeLabel = (request) =>
-  request.requestType === "trainer" ? "Trainer Change" : "Plan Change";
+  request.requestType === "new_client"
+    ? "New Client"
+    : request.requestType === "trainer"
+    ? "Trainer Change"
+    : "Plan Change";
 
 const TrainerDashboard = ({ userId = null }) => {
   const { trainerId: trainerIdParam } = useParams();
@@ -32,15 +38,18 @@ const TrainerDashboard = ({ userId = null }) => {
   const trainerId = Number(trainerIdParam ?? userId);
   const trainer = trainers.find((item) => item.id === trainerId);
   const trainerPlanRequests = useMemo(
-    () => approvalRequests.filter((request) => request.trainerId === trainerId),
+    () =>
+      approvalRequests.filter(
+        (request) => (request.trainerId ?? request.requestedTrainerId) === trainerId
+      ),
     [approvalRequests, trainerId]
   );
   const pendingPlanRequests = trainerPlanRequests.filter(
     (request) => request.status === "pending"
   );
 
-  const handlePlanRequestReview = (requestId, decision) => {
-    const result = reviewApprovalRequest({
+  const handlePlanRequestReview = async (requestId, decision) => {
+    const result = await reviewApprovalRequest({
       requestId,
       actorRole: "trainer",
       decision,
@@ -53,9 +62,16 @@ const TrainerDashboard = ({ userId = null }) => {
     }
 
     if (decision === "approved") {
+      if (result.recovered) {
+        toast.success("Request was already approved. Member membership/trainer sync was retried.");
+        return;
+      }
+
       toast.success(
         result.applied
-          ? result.request?.requestType === "trainer"
+          ? result.request?.requestType === "new_client"
+            ? "Trainer approved the new client request and membership is now active."
+            : result.request?.requestType === "trainer"
             ? "Trainer approved the request and the member assignment was updated."
             : "Trainer approved the request and the member plan was updated."
           : "Trainer approved the request. Waiting for admin approval."
@@ -64,7 +80,9 @@ const TrainerDashboard = ({ userId = null }) => {
     }
 
     toast.success(
-      result.request?.requestType === "trainer"
+      result.request?.requestType === "new_client"
+        ? "New client request rejected by trainer."
+        : result.request?.requestType === "trainer"
         ? "Trainer change request rejected by trainer."
         : "Plan change request rejected by trainer."
     );
@@ -214,7 +232,9 @@ const TrainerDashboard = ({ userId = null }) => {
                 ) : (
                   <small>
                     {request.status === "approved"
-                      ? request.requestType === "trainer"
+                      ? request.requestType === "new_client"
+                        ? "This new client is fully approved and now active."
+                        : request.requestType === "trainer"
                         ? "This request has been fully approved and the trainer assignment is now active."
                         : "This request has been fully approved and the plan is now active."
                       : request.status === "rejected"

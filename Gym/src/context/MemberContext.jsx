@@ -35,10 +35,37 @@ export const MemberProvider = ({ children }) => {
 
   const updateMemberPlan = async (memberId, nextPlanId) => {
     try {
-      await api.patch(`members/${memberId}/`, { plan: nextPlanId });
-      fetchMembers();
+      let resolvedPlanId = nextPlanId;
+
+      if (typeof nextPlanId === "string") {
+        const trimmed = nextPlanId.trim();
+        const numeric = Number(trimmed);
+        if (!Number.isFinite(numeric) || numeric <= 0) {
+          const plansResponse = await api.get("plans/");
+          const matchedPlan = (plansResponse.data || []).find(
+            (plan) => String(plan.name || "").trim().toLowerCase() === trimmed.toLowerCase()
+          );
+          if (!matchedPlan?.id) {
+            return {
+              ok: false,
+              error: `Membership plan '${nextPlanId}' was not found.`,
+            };
+          }
+          resolvedPlanId = matchedPlan.id;
+        } else {
+          resolvedPlanId = numeric;
+        }
+      }
+
+      await api.patch(`members/${memberId}/`, { plan: resolvedPlanId });
+      await fetchMembers();
+      return { ok: true };
     } catch (error) {
       console.error("Failed to update plan", error);
+      return {
+        ok: false,
+        error: error.response?.data?.detail || "Failed to update member plan",
+      };
     }
   };
 
@@ -76,9 +103,87 @@ export const MemberProvider = ({ children }) => {
         throw new Error("Invalid trainer selected.");
       }
       await api.patch(`members/${memberId}/`, { trainer: trainer.id });
-      fetchMembers();
+      await fetchMembers();
+      return { ok: true };
     } catch (error) {
       console.error("Failed to switch trainer", error);
+      return {
+        ok: false,
+        error: error.response?.data?.detail || "Failed to switch trainer",
+      };
+    }
+  };
+
+  const applyMemberOnboarding = async ({ memberId, planValue, trainerId }) => {
+    try {
+      let resolvedPlanId = planValue;
+      if (typeof resolvedPlanId === "string") {
+        const trimmed = resolvedPlanId.trim();
+        const numeric = Number(trimmed);
+        if (!Number.isFinite(numeric) || numeric <= 0) {
+          const plansResponse = await api.get("plans/");
+          const matchedPlan = (plansResponse.data || []).find(
+            (plan) => String(plan.name || "").trim().toLowerCase() === trimmed.toLowerCase()
+          );
+          if (!matchedPlan?.id) {
+            return { ok: false, error: `Membership plan '${planValue}' was not found.` };
+          }
+          resolvedPlanId = matchedPlan.id;
+        } else {
+          resolvedPlanId = numeric;
+        }
+      }
+
+      const payload = {};
+      if (resolvedPlanId != null && resolvedPlanId !== "") {
+        payload.plan = resolvedPlanId;
+      }
+      if (trainerId != null && trainerId !== "") {
+        payload.trainer = Number(trainerId);
+      }
+
+      await api.patch(`members/${memberId}/`, payload);
+      await fetchMembers();
+      return { ok: true };
+    } catch (error) {
+      console.error("Failed to apply member onboarding", error);
+      return {
+        ok: false,
+        error: error.response?.data?.detail || "Failed to apply member onboarding",
+      };
+    }
+  };
+
+  const addMemberFeedback = async (memberId, feedbackInput) => {
+    try {
+      const member = memberRecords.find((item) => item.id === Number(memberId));
+      if (!member) {
+        return { ok: false, error: "Member not found." };
+      }
+
+      const nextEntry = {
+        id: `feedback-${Date.now()}`,
+        category: feedbackInput?.category || "General",
+        rating: Number(feedbackInput?.rating || 5),
+        message: String(feedbackInput?.message || "").trim(),
+        createdAt: new Date().toISOString(),
+      };
+
+      if (!nextEntry.message) {
+        return { ok: false, error: "Feedback message is required." };
+      }
+
+      const nextFeedback = [...(member.feedback || []), nextEntry];
+      await api.patch(`members/${member.id}/`, { feedback: nextFeedback });
+      await fetchMembers();
+
+      return { ok: true, feedback: nextEntry };
+    } catch (error) {
+      console.error("Failed to add feedback", error);
+      return {
+        ok: false,
+        error: error.response?.data?.detail || "Failed to submit feedback",
+      };
     }
   };
 
@@ -152,6 +257,8 @@ export const MemberProvider = ({ children }) => {
       registerMember,
       updateMemberPlan,
       switchMemberTrainer,
+      applyMemberOnboarding,
+      addMemberFeedback,
       updateMemberProfile,
       deleteMemberAccount,
       removeMemberFeedback,
